@@ -15,10 +15,64 @@ class Book:
         self.book_status = book_status
 
     def Add_New_Book():
-        pass
+        try:
+            connection = sql.connector.connect(host='localhost',
+                                               database='library',
+                                               user='root',
+                                               password='password')
+            cursor = connection.cursor()
+            cursor.execute("INSERT INTO books(book_name, author_id, genre_id, user_id, book_status) VALUES(%s, %s, %s, %s, %s)",
+                           (self.book_name, self.author, self.genre, self.user, self.book_status))
+            connection.commit()
+            print("Book added successfully")
+        except Error as e:
+            print("Error while connecting to MySQL", e)
+        finally:
+            if connection.is_connected():
+                cursor.close()
+                connection.close()
 
     def View_Book_Details():
-        pass
+        try:
+            connection = sql.connector.connect(host='localhost',
+                                               database='library',
+                                               user='root',
+                                               password='password')
+            cursor = connection.cursor()
+            cursor.execute("SELECT * FROM books WHERE book_id = %s", (self.book_id,))
+            record = cursor.fetchone()
+            print("Book ID: ", record[0])
+            print("Book Name: ", record[1])
+            print("Author: ", record[2])
+            print("Genre: ", record[3])
+            print("User: ", record[4])
+            print("Book Status: ", record[5])
+        except Error as e:
+            print("Error while connecting to MySQL", e)
+        finally:
+            if connection.is_connected():
+                cursor.close()
+                connection.close()
 
     def Display_All_Books():
-        pass
+        try:
+            connection = sql.connector.connect(host='localhost',
+                                               database='library',
+                                               user='root',
+                                               password='password')
+            cursor = connection.cursor()
+            cursor.execute("SELECT * FROM books")
+            records = cursor.fetchall()
+            for record in records:
+                print("Book ID: ", record[0])
+                print("Book Name: ", record[1])
+                print("Author: ", record[2])
+                print("Genre: ", record[3])
+                print("User: ", record[4])
+                print("Book Status: ", record[5])
+        except Error as e:
+            print("Error while connecting to MySQL", e)
+        finally:
+            if connection.is_connected():
+                cursor.close()
+                connection.close()
