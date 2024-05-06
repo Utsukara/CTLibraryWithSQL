@@ -70,7 +70,7 @@ INSERT INTO users (name, email, phone, address, password) VALUES
 ('Alice Johnson', 'alice.johnson@example.com', '1234567890', '123 Maple Street', 'alicepassword'),
 ('Bob Smith', 'bob.smith@example.com', '2345678901', '456 Oak Avenue', 'bobpassword');
 
--- Insert data into Borrowed Books table (if you track book loans)
+-- Insert data into Borrowed Books table (track book loans)
 INSERT INTO borrowed_books (book_id, user_id, borrow_date, return_date) VALUES
 (1, 1, '2023-01-01', '2023-01-31'),
 (2, 2, '2023-01-05', '2023-02-05');
