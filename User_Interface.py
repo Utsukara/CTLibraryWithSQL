@@ -26,10 +26,12 @@ class UserInterface:
             elif choice == "4":
                 UserInterface.handle_genre_operations(database_manager)
             elif choice == "5":
-                exit()
+                print("Exiting system...")
+                break
             else:
                 print("Invalid choice. Please try again.")
 
+    # Book operations
     @staticmethod
     def display_book_menu():
         print("Book Operations:")
@@ -46,25 +48,34 @@ class UserInterface:
             UserInterface.display_book_menu()
             choice = UserInterface.get_user_input("Enter your choice: ")
             if choice == "1":
-                # Add new book code
-                pass
+                title = UserInterface.get_user_input("Enter the title of the book: ")
+                author_id = UserInterface.get_user_input("Enter the author ID: ")
+                genre_id = UserInterface.get_user_input("Enter the genre ID: ")
+                isbn = UserInterface.get_user_input("Enter the ISBN: ")
+                publication_date = UserInterface.get_user_input("Enter the publication date (YYYY-MM-DD): ")
+                database_manager.add_new_book(title, int(author_id), int(genre_id), isbn, publication_date)
             elif choice == "2":
-                # Modify book information code
-                pass
+                book_id = int(UserInterface.get_user_input("Enter book ID to modify: "))
+                title = UserInterface.get_user_input("Enter the new title of the book (press enter to skip): ")
+                author_id = UserInterface.get_user_input("Enter the new author ID (press enter to skip): ")
+                genre_id = UserInterface.get_user_input("Enter the new genre ID (press enter to skip): ")
+                isbn = UserInterface.get_user_input("Enter the new ISBN (press enter to skip): ")
+                publication_date = UserInterface.get_user_input("Enter the new publication date (press enter to skip): ")
+                database_manager.update_book(book_id, title, author_id, genre_id, isbn, publication_date)
             elif choice == "3":
-                # Remove a book code
-                pass
+                book_id = int(UserInterface.get_user_input("Enter book ID to remove: "))
+                database_manager.remove_book(book_id)
             elif choice == "4":
-                # Search for a book code
-                pass
+                keyword = UserInterface.get_user_input("Enter search keyword: ")
+                database_manager.search_books(keyword)
             elif choice == "5":
-                # Display all books code
-                pass
+                database_manager.display_all_books()
             elif choice == "6":
                 break
             else:
                 print("Invalid choice. Please try again.")
 
+                # User operations
     @staticmethod
     def display_user_menu():
         print("User Operations:")
@@ -80,22 +91,31 @@ class UserInterface:
             UserInterface.display_user_menu()
             choice = UserInterface.get_user_input("Enter your choice: ")
             if choice == "1":
-                # Add new user code
-                pass
+                name = UserInterface.get_user_input("Enter the user's name: ")
+                email = UserInterface.get_user_input("Enter the user's email: ")
+                phone = UserInterface.get_user_input("Enter the user's phone number: ")
+                address = UserInterface.get_user_input("Enter the user's address: ")
+                password = UserInterface.get_user_input("Enter the user's password: ")
+                database_manager.add_new_user(name, email, phone, address, password)
             elif choice == "2":
-                # Modify user information code
-                pass
+                user_id = int(UserInterface.get_user_input("Enter user ID to modify: "))
+                name = UserInterface.get_user_input("Enter new name (press enter to skip): ")
+                email = UserInterface.get_user_input("Enter new email (press enter to skip): ")
+                phone = UserInterface.get_user_input("Enter new phone number (press enter to skip): ")
+                address = UserInterface.get_user_input("Enter new address (press enter to skip): ")
+                password = UserInterface.get_user_input("Enter new password (press enter to skip): ")
+                database_manager.update_user(user_id, name, email, phone, address, password)
             elif choice == "3":
-                # Remove a user code
-                pass
+                user_id = int(UserInterface.get_user_input("Enter user ID to remove: "))
+                database_manager.remove_user(user_id)
             elif choice == "4":
-                # Display all users code
-                pass
+                database_manager.display_all_users()
             elif choice == "5":
                 break
             else:
                 print("Invalid choice. Please try again.")
 
+    # Author operations
     @staticmethod
     def display_author_menu():
         print("Author Operations:")
@@ -111,22 +131,25 @@ class UserInterface:
             UserInterface.display_author_menu()
             choice = UserInterface.get_user_input("Enter your choice: ")
             if choice == "1":
-                # Add new author code
-                pass
+                name = UserInterface.get_user_input("Enter author's name: ")
+                biography = UserInterface.get_user_input("Enter author's biography: ")
+                database_manager.add_new_author(name, biography)
             elif choice == "2":
-                # Modify author information code
-                pass
+                author_id = int(UserInterface.get_user_input("Enter author ID to modify: "))
+                name = UserInterface.get_user_input("Enter new name (press enter to skip): ")
+                biography = UserInterface.get_user_input("Enter new biography (press enter to skip): ")
+                database_manager.update_author(author_id, name, biography)
             elif choice == "3":
-                # Remove an author code
-                pass
+                author_id = int(UserInterface.get_user_input("Enter author ID to remove: "))
+                database_manager.remove_author(author_id)
             elif choice == "4":
-                # Display all authors code
-                pass
+                database_manager.display_all_authors()
             elif choice == "5":
                 break
             else:
                 print("Invalid choice. Please try again.")
 
+    # Genre operations
     @staticmethod
     def display_genre_menu():
         print("Genre Operations:")
@@ -142,18 +165,22 @@ class UserInterface:
             UserInterface.display_genre_menu()
             choice = UserInterface.get_user_input("Enter your choice: ")
             if choice == "1":
-                # Add new genre code
-                pass
+                name = UserInterface.get_user_input("Enter genre name: ")
+                description = UserInterface.get_user_input("Enter genre description: ")
+                category = UserInterface.get_user_input("Enter genre category: ")
+                database_manager.add_new_genre(name, description, category)
             elif choice == "2":
-                # Modify genre information code
-                pass
+                genre_id = int(UserInterface.get_user_input("Enter genre ID to modify: "))
+                name = UserInterface.get_user_input("Enter new name (press enter to skip): ")
+                description = UserInterface.get_user_input("Enter new description (press enter to skip): ")
+                category = UserInterface.get_user_input("Enter new category (press enter to skip): ")
+                database_manager.update_genre(genre_id, name, description, category)
             elif choice == "3":
-                # Remove a genre code
-                pass
+                genre_id = int(UserInterface.get_user_input("Enter genre ID to remove: "))
+                database_manager.remove_genre(genre_id)
             elif choice == "4":
-                # Display all genres code
-                pass
+                database_manager.display_all_genres()
             elif choice == "5":
-                break            
+                break
             else:
                 print("Invalid choice. Please try again.")
