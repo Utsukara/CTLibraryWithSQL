@@ -4,8 +4,75 @@ class UserInterface:
         return input(prompt)
 
     @staticmethod
-    def display_main_menu():
+    def display_initial_menu():
         print("Welcome to the Library Management System!")
+        print("1. Customer")
+        print("2. Librarian")
+        print("3. New Customer")
+        print("4. Quit")
+
+    @staticmethod
+    def handle_initial_menu(database_manager):
+        while True:
+            UserInterface.display_initial_menu()
+            choice = UserInterface.get_user_input("Enter your choice: ")
+            if choice == "1":
+                UserInterface.handle_customer_sign_in(database_manager)
+            elif choice == "2":
+                UserInterface.handle_librarian_sign_in(database_manager)
+            elif choice == "3":
+                UserInterface.handle_new_customer_sign_up(database_manager)
+            elif choice == "4":
+                print("Exiting system...")
+                break
+            else:
+                print("Invalid choice. Please try again.")
+
+    @staticmethod
+    def handle_customer_sign_in(database_manager):
+        username = UserInterface.get_user_input("Enter your username: ")
+        password = UserInterface.get_user_input("Enter your password: ")
+        if database_manager.authenticate_customer(username, password):
+            print("Login successful.")
+            UserInterface.customer_menu(database_manager)
+        else:
+            print("Login failed. Please check your username and password.")
+
+    @staticmethod
+    def handle_librarian_sign_in(database_manager):
+        password = UserInterface.get_user_input("Enter librarian password: ")
+        if password == "librarian":
+            print("Librarian access granted.")
+            UserInterface.handle_librarian_main_menu(database_manager)
+        else:
+            print("Access denied. Incorrect password.")
+
+    @staticmethod
+    def handle_new_customer_sign_up(database_manager):
+        name = UserInterface.get_user_input("Enter your name: ")
+        email = UserInterface.get_user_input("Enter your email: ")
+        phone = UserInterface.get_user_input("Enter your phone number: ")
+        address = UserInterface.get_user_input("Enter your address: ")
+        username = UserInterface.get_user_input("Choose a username: ")
+        password = UserInterface.get_user_input("Choose a password: ")
+        if database_manager.register_new_customer(name, email, phone, address, username, password):
+            print("Registration successful. You can now login as a customer.")
+        else:
+            print("Registration failed. Please try again.")
+
+    @staticmethod
+    def customer_menu(database_manager):
+        print("Customer Menu:")
+        print("1. Browse books")
+        print("2. Borrow books")
+        print("3. Return books")
+        print("4. View my borrowed books")
+        print("5. Logout")
+        choice = UserInterface.get_user_input("Enter your choice: ")
+
+    @staticmethod
+    def display_main_menu_librarian():
+        print("Librarian Menu:")
         print("1. Book Operations")
         print("2. User Operations")
         print("3. Author Operations")
@@ -13,9 +80,9 @@ class UserInterface:
         print("5. Quit")
 
     @staticmethod
-    def handle_main_menu(database_manager):
+    def handle_librarian_main_menu(database_manager):
         while True:
-            UserInterface.display_main_menu()
+            UserInterface.display_main_menu_librarian()
             choice = UserInterface.get_user_input("Enter your choice: ")
             if choice == "1":
                 UserInterface.handle_book_operations(database_manager)
@@ -75,7 +142,7 @@ class UserInterface:
             else:
                 print("Invalid choice. Please try again.")
 
-                # User operations
+    # User operations
     @staticmethod
     def display_user_menu():
         print("User Operations:")
