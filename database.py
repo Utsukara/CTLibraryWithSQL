@@ -195,3 +195,28 @@ class DatabaseManager:
         query = f"UPDATE users SET {', '.join(updates)} WHERE id = %s"
         self.execute_query(query, params)
         print("User updated successfully.")
+
+    def authenticate_customer(self, username, password):
+        query = "SELECT id FROM users WHERE username = %s AND password = %s"
+        results = self.perform_database_operation(query, (username, password), fetch=True)
+        if results:
+            return results[0][0]  #return customer ID
+        return None
+    
+    def register_new_customer(self, name, email, phone, address, username, password):
+        # Check if username or email already exists to avoid duplicates
+        check_query = "SELECT EXISTS(SELECT 1 FROM users WHERE username=%s OR email=%s)"
+        exists = self.fetch_all(check_query, (username, email))
+        if exists[0][0]:
+            print("Username or email already exists. Please try a different one.")
+            return False
+
+        # Insert new user into the database
+        query = "INSERT INTO users (name, email, phone, address, username, password) VALUES (%s, %s, %s, %s, %s, %s)"
+        try:
+            self.execute_query(query, (name, email, phone, address, username, password))
+            print("New customer registered successfully.")
+            return True
+        except Error as e:
+            print(f"Error registering new customer: {e}")
+            return False

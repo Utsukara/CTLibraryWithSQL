@@ -20,12 +20,13 @@ class Book:
         return f"Book({self.title}, ISBN: {self.isbn})"
 
 class User:
-    def __init__(self, user_id, name, email, phone, address, password):
+    def __init__(self, user_id, name, email, phone, address, username, password):
         self._user_id = user_id
         self.name = name
         self.email = email
         self.phone = phone
         self.address = address
+        self.username = username
         self.password = password
 
     @property
@@ -42,7 +43,8 @@ class User:
         print(f"Updated contact info for {self.name}.")
 
     def __str__(self):
-        return f"User({self.name}, Email: {self.email})"
+        return f"User(Name: {self.name}, Username: {self.username}, Email: {self.email})"
+
 
 class Author:
     def __init__(self, author_id, name, biography):

@@ -30,6 +30,7 @@ CREATE TABLE books (
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
+    username VARCHAR(255) UNIQUE NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     phone VARCHAR(15),
     address TEXT,
@@ -39,9 +40,9 @@ CREATE TABLE users (
 -- Create table for Borrowed Books (if needed)
 CREATE TABLE borrowed_books (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    book_id INT,
-    user_id INT,
-    borrow_date DATE,
+    book_id INT NOT NULL,
+    user_id INT NOT NULL,
+    borrow_date DATE NOT NULL,
     return_date DATE,
     FOREIGN KEY (book_id) REFERENCES books(id),
     FOREIGN KEY (user_id) REFERENCES users(id)
@@ -67,8 +68,13 @@ INSERT INTO books (title, author_id, genre_id, isbn, publication_date, available
 
 -- Insert data into Users table
 INSERT INTO users (name, email, phone, address, password) VALUES
-('Alice Johnson', 'alice.johnson@example.com', '1234567890', '123 Maple Street', 'alicepassword'),
-('Bob Smith', 'bob.smith@example.com', '2345678901', '456 Oak Avenue', 'bobpassword');
+INSERT INTO users (name, username, email, phone, address, password) VALUES
+('Alice Johnson', 'alicejohnson', 'alice.johnson@example.com', '1234567890', '123 Maple Street', 'alicepassword'),
+('Bob Smith', 'bobsmith', 'bob.smith@example.com', '2345678901', '456 Oak Avenue', 'bobpassword'),
+('Carol White', 'carolwhite', 'carol.white@example.com', '3456789012', '789 Pine Road', 'carolpassword'),
+('David Brown', 'davidbrown', 'david.brown@example.com', '4567890123', '1012 Cedar Lane', 'davidpassword'),
+('Eve Black', 'eveblack', 'eve.black@example.com', '5678901234', '1314 Spruce Blvd', 'evepassword');
+
 
 -- Insert data into Borrowed Books table (track book loans)
 INSERT INTO borrowed_books (book_id, user_id, borrow_date, return_date) VALUES
