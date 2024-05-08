@@ -35,7 +35,7 @@ class UserInterface:
         customer_id = database_manager.authenticate_user(username, password)
         if customer_id:
             print(f"Welcome Customer#{customer_id}! Login Successful")
-            UserInterface.customer_menu(database_manager)
+            UserInterface.handle_customer_menu(database_manager)
         else:
             print("Login failed. Please check your username and password.")
 
@@ -73,7 +73,6 @@ class UserInterface:
         print("4. View my borrowed books")
         print("5. My account")
         print("6. Logout")
-        choice = UserInterface.get_user_input("Enter your choice: ")
 
     def handle_customer_menu(database_manager):
         while True:
@@ -83,23 +82,24 @@ class UserInterface:
                 database_manager.display_all_books()
             elif choice == "2":
                 book_id = int(UserInterface.get_user_input("Enter the ID of the book you want to borrow: "))
-                customer_id = int(UserInterface.get_user_input("Enter your customer ID: "))
-                database_manager.borrow_book(book_id, customer_id)
+                username = UserInterface.get_user_input("Enter your username: ")
+                database_manager.borrow_book(book_id, username)
             elif choice == "3":
                 book_id = int(UserInterface.get_user_input("Enter the ID of the book you want to return: "))
-                customer_id = int(UserInterface.get_user_input("Enter your customer ID: "))
-                database_manager.return_book(book_id, customer_id)
+                username = UserInterface.get_user_input("Enter your username: ")
+                database_manager.return_book(book_id, username)
             elif choice == "4":
-                customer_id = int(UserInterface.get_user_input("Enter your customer ID: "))
-                database_manager.view_borrowed_books(customer_id)
+                username = UserInterface.get_user_input("Enter your username: ")
+                database_manager.view_borrowed_books(username)
             elif choice == "5":
-                customer_id = int(UserInterface.get_user_input("Enter your customer ID: "))
-                database_manager.view_customer_account(customer_id)
+                username = UserInterface.get_user_input("Enter your username: ")
+                database_manager.view_customer_account(username)
             elif choice == "6":
                 print("Logging out...")
-                exit()
+                break
             else:
                 print("Invalid choice. Please try again.")
+
 
     @staticmethod
     def display_main_menu_librarian():
@@ -125,7 +125,7 @@ class UserInterface:
                 UserInterface.handle_genre_operations(database_manager)
             elif choice == "5":
                 print("Exiting system...")
-                exit()
+                break
             else:
                 print("Invalid choice. Please try again.")
 
@@ -250,8 +250,8 @@ class UserInterface:
             choice = UserInterface.get_user_input("Enter your choice: ")
             if choice == "1":
                 name = UserInterface.get_user_input("Enter author's name: ")
-                biography = UserInterface.get_user_input("Enter author's biography: ")
-                database_manager.add_new_author(name, biography)
+                biography = UserInterface.get_user_input("Enter author's biography (press enter to skip): ")
+                database_manager.add_new_author(name, biography.strip() or None)
             elif choice == "2":
                 author_id = int(UserInterface.get_user_input("Enter author ID to modify: "))
                 name = UserInterface.get_user_input("Enter new name (press enter to skip): ")
@@ -285,14 +285,12 @@ class UserInterface:
             if choice == "1":
                 name = UserInterface.get_user_input("Enter genre name: ")
                 description = UserInterface.get_user_input("Enter genre description: ")
-                category = UserInterface.get_user_input("Enter genre category: ")
-                database_manager.add_new_genre(name, description, category)
+                database_manager.add_new_genre(name, description)
             elif choice == "2":
                 genre_id = int(UserInterface.get_user_input("Enter genre ID to modify: "))
-                name = UserInterface.get_user_input("Enter new name (press enter to skip): ")
-                description = UserInterface.get_user_input("Enter new description (press enter to skip): ")
-                category = UserInterface.get_user_input("Enter new category (press enter to skip): ")
-                database_manager.update_genre(genre_id, name, description, category)
+                name = UserInterface.get_user_input("Enter new name (press enter to skip): ").strip()
+                description = UserInterface.get_user_input("Enter new description (press enter to skip): ").strip()
+                database_manager.update_genre(genre_id, name, description)
             elif choice == "3":
                 genre_id = int(UserInterface.get_user_input("Enter genre ID to remove: "))
                 database_manager.remove_genre(genre_id)

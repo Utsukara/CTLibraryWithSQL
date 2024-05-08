@@ -1,5 +1,6 @@
 import mysql.connector
 from mysql.connector import Error
+from datetime import datetime, timedelta
 
 class DatabaseManager:
     def __init__(self, host, database, user, password):
@@ -54,6 +55,8 @@ class DatabaseManager:
             self.disconnect()
         return results
 
+
+
     # Book operations
     def add_new_book(self, title, author_id, genre_id, publication_date):
         query = "INSERT INTO books (title, author_id, genre_id, publication_date) VALUES (%s, %s, %s, %s)"
@@ -95,10 +98,11 @@ class DatabaseManager:
         print("Book updated successfully.")
 
 
+
     # Author operations
-    def add_new_author(self, name):
-        query = "INSERT INTO authors (name, biography) VALUES (%s, '')"
-        self.execute_query(query, (name,))
+    def add_new_author(self, name, biography=''):
+        query = "INSERT INTO authors (name, biography) VALUES (%s, %s)"
+        self.execute_query(query, (name, biography or 'No biography provided'))
         print("Author added successfully.")
 
     def remove_author(self, author_id):
@@ -131,8 +135,11 @@ class DatabaseManager:
             author_id = self.fetch_all("SELECT id FROM authors WHERE name = %s", (author_name,))
         return author_id[0][0]
 
+
+
     # Genre operations
-    def add_new_genre(self, name, description=''):
+    def add_new_genre(self, name, description=None):
+        description = description if description is not None else 'No description provided'
         query = "INSERT INTO genres (name, description) VALUES (%s, %s)"
         self.execute_query(query, (name, description))
         print("Genre added successfully.")
@@ -142,9 +149,9 @@ class DatabaseManager:
         print("Genre removed successfully.")
 
     def display_all_genres(self):
-        results = self.fetch_all("SELECT * FROM genres", None)
+        results = self.fetch_all("SELECT id, name, description FROM genres", None)
         for result in results:
-            print(result)
+            print(f"ID: {result[0]}, Name: {result[1]}, Description: {result[2]}")
 
     def update_genre(self, genre_id, name=None, description=None):
         updates = []
@@ -155,17 +162,23 @@ class DatabaseManager:
         if description:
             updates.append("description = %s")
             params.append(description)
+        if not updates:
+            print("No updates provided.")
+            return
         params.append(genre_id)
         query = f"UPDATE genres SET {', '.join(updates)} WHERE id = %s"
         self.execute_query(query, params)
         print("Genre updated successfully.")
 
-    def find_or_add_genre(self, genre_name):
+    def find_or_add_genre(self, genre_name, description=None):
         genre_id = self.fetch_all("SELECT id FROM genres WHERE name = %s", (genre_name,))
         if not genre_id:
-            self.execute_query("INSERT INTO genres (name, description) VALUES (%s, '')", (genre_name,))
+            description = description if description else 'No description provided'
+            self.execute_query("INSERT INTO genres (name, description) VALUES (%s, %s)", (genre_name, description))
             genre_id = self.fetch_all("SELECT id FROM genres WHERE name = %s", (genre_name,))
+            print(f"Genre '{genre_name}' added successfully.")
         return genre_id[0][0]
+
 
     # User operations
     def add_new_user(self, name, email, phone, address, username, password):
@@ -214,26 +227,45 @@ class DatabaseManager:
         else:
             return None
         
-    def borrow_book(self, book_id, user_id):
-        # Check if book is available
-        available = self.fetch_all("SELECT available FROM books WHERE id = %s", (book_id,))
-        if available and available[0][0]:
-            # Set book as borrowed
-            self.execute_query("UPDATE books SET available = 0 WHERE id = %s", (book_id,))
-            # Record the borrow
-            self.execute_query("INSERT INTO borrowed_books (book_id, user_id, borrow_date) VALUES (%s, %s, CURDATE())", (book_id, user_id))
-            print("Book borrowed successfully.")
+    def borrow_book(self, book_id, username):
+        user_id = self.fetch_all("SELECT id FROM users WHERE username = %s", (username,))
+        if user_id:
+            available = self.fetch_all("SELECT available FROM books WHERE id = %s", (book_id,))
+            if available and available[0][0]:
+                return_date = datetime.now() + timedelta(days=14)
+                self.execute_query("UPDATE books SET available = 0 WHERE id = %s", (book_id,))
+                self.execute_query("INSERT INTO borrowed_books (book_id, user_id, borrow_date, return_date) VALUES (%s, %s, CURDATE(), %s)", (book_id, user_id[0][0], return_date.strftime('%Y-%m-%d')))
+                print("Book borrowed successfully. Return by: ", return_date.strftime('%Y-%m-%d'))
+            else:
+                print("This book is currently unavailable.")
         else:
-            print("This book is currently unavailable.")
+            print("User not found.")
 
-    def return_book(self, book_id, user_id):
-        # Check if the book is borrowed by the user
-        borrowed = self.fetch_all("SELECT id FROM borrowed_books WHERE book_id = %s AND user_id = %s", (book_id, user_id))
-        if borrowed:
-            # Set book as available
-            self.execute_query("UPDATE books SET available = 1 WHERE id = %s", (book_id,))
-            # Remove the borrow record
-            self.execute_query("DELETE FROM borrowed_books WHERE id = %s", (borrowed[0][0],))
-            print("Book returned successfully.")
+    def return_book(self, book_id, username):
+        user_id = self.fetch_all("SELECT id FROM users WHERE username = %s", (username,))
+        if user_id:
+            borrowed = self.fetch_all("SELECT id FROM borrowed_books WHERE book_id = %s AND user_id = %s", (book_id, user_id[0][0]))
+            if borrowed:
+                self.execute_query("UPDATE books SET available = 1 WHERE id = %s", (book_id,))
+                self.execute_query("DELETE FROM borrowed_books WHERE id = %s", (borrowed[0][0],))
+                print("Book returned successfully.")
+            else:
+                print("This book was not borrowed by you or does not exist.")
         else:
-            print("This book was not borrowed by you or does not exist.")
+            print("User not found.")
+
+    def view_borrowed_books(self, username):
+        user_id = self.fetch_all("SELECT id FROM users WHERE username = %s", (username,))
+        if user_id:
+            results = self.fetch_all("SELECT b.title, bb.borrow_date, bb.return_date FROM borrowed_books bb JOIN books b ON bb.book_id = b.id WHERE bb.user_id = %s", (user_id[0][0],))
+            for result in results:
+                print(f"Title: {result[0]}, Borrowed on: {result[1]}, Return by: {result[2]}")
+        else:
+            print("User not found.")
+
+    def view_customer_account(self, username):
+        results = self.fetch_all("SELECT name, email, phone, address FROM users WHERE username = %s", (username,))
+        if results:
+            print(f"Name: {results[0][0]}, Email: {results[0][1]}, Phone: {results[0][2]}, Address: {results[0][3]}")
+        else:
+            print("User not found.")
