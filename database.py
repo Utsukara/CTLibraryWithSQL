@@ -204,3 +204,12 @@ class DatabaseManager:
         query = f"UPDATE users SET {', '.join(updates)} WHERE id = %s"
         self.execute_query(query, params)
         print("User updated successfully.")
+
+    def authenticate_user(self, username, password):
+        # implement hashing for password in future implementations
+        query = "SELECT id FROM users WHERE username = %s AND password = %s"
+        results = self.fetch_all(query, (username, password))
+        if results:
+            return results[0][0]
+        else:
+            return None

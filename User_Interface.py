@@ -24,7 +24,7 @@ class UserInterface:
                 UserInterface.handle_new_customer_sign_up(database_manager)
             elif choice == "4":
                 print("Exiting system...")
-                break
+                quit()
             else:
                 print("Invalid choice. Please try again.")
 
@@ -32,7 +32,7 @@ class UserInterface:
     def handle_customer_sign_in(database_manager):
         username = UserInterface.get_user_input("Enter your username: ")
         password = UserInterface.get_user_input("Enter your password: ")
-        customer_id = database_manager.authenticate_customer(username, password)
+        customer_id = database_manager.authenticate_user(username, password)
         if customer_id:
             print(f"Welcome Customer#{customer_id}! Login Successful")
             UserInterface.customer_menu(database_manager)
@@ -95,6 +95,11 @@ class UserInterface:
             elif choice == "5":
                 customer_id = int(UserInterface.get_user_input("Enter your customer ID: "))
                 database_manager.view_customer_account(customer_id)
+            elif choice == "6":
+                print("Logging out...")
+                quit()
+            else:
+                print("Invalid choice. Please try again.")
 
     @staticmethod
     def display_main_menu_librarian():
@@ -120,7 +125,7 @@ class UserInterface:
                 UserInterface.handle_genre_operations(database_manager)
             elif choice == "5":
                 print("Exiting system...")
-                break
+                quit()
             else:
                 print("Invalid choice. Please try again.")
 
@@ -151,8 +156,29 @@ class UserInterface:
 
                 database_manager.add_new_book(title, author_id, genre_id, publication_date)
             elif choice == "2":
-                book_id = int(UserInterface.get_user_input("Enter book ID to modify: "))
-                # remaining modification logic
+                book_title = UserInterface.get_user_input("Enter the title of the book to modify: ")
+                books = database_manager.search_books_by_title(book_title)
+                if not books:
+                    print("No book found with that title. Returning to menu.")
+                    continue
+                elif len(books) > 1:
+                    print("Multiple books found. Please specify by book ID:")
+                    for book in books:
+                        print(f"ID: {book[0]}, Title: {book[1]}")
+                    book_id = int(UserInterface.get_user_input("Enter the book ID to modify: "))
+                else:
+                    book_id = books[0][0]
+                
+                new_title = UserInterface.get_user_input("Enter new title (press enter to skip): ")
+                new_author_name = UserInterface.get_user_input("Enter new author's name (press enter to skip): ")
+                new_genre_name = UserInterface.get_user_input("Enter new genre (press enter to skip): ")
+                new_publication_date = UserInterface.get_user_input("Enter new publication date (YYYY-MM-DD, press enter to skip): ")
+
+                author_id = database_manager.find_or_add_author(new_author_name) if new_author_name else None
+                genre_id = database_manager.find_or_add_genre(new_genre_name) if new_genre_name else None
+
+                database_manager.update_book(book_id, new_title, author_id, genre_id, new_publication_date)
+                print("Book updated successfully.")
             elif choice == "3":
                 book_id = int(UserInterface.get_user_input("Enter book ID to remove: "))
                 database_manager.remove_book(book_id)
