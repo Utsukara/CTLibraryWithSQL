@@ -19,7 +19,6 @@ CREATE TABLE books (
     title VARCHAR(255) NOT NULL,
     author_id INT,
     genre_id INT,
-    isbn VARCHAR(20) UNIQUE NOT NULL,
     publication_date DATE,
     available BOOLEAN DEFAULT TRUE,
     FOREIGN KEY (author_id) REFERENCES authors(id),
