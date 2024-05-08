@@ -213,3 +213,27 @@ class DatabaseManager:
             return results[0][0]
         else:
             return None
+        
+    def borrow_book(self, book_id, user_id):
+        # Check if book is available
+        available = self.fetch_all("SELECT available FROM books WHERE id = %s", (book_id,))
+        if available and available[0][0]:
+            # Set book as borrowed
+            self.execute_query("UPDATE books SET available = 0 WHERE id = %s", (book_id,))
+            # Record the borrow
+            self.execute_query("INSERT INTO borrowed_books (book_id, user_id, borrow_date) VALUES (%s, %s, CURDATE())", (book_id, user_id))
+            print("Book borrowed successfully.")
+        else:
+            print("This book is currently unavailable.")
+
+    def return_book(self, book_id, user_id):
+        # Check if the book is borrowed by the user
+        borrowed = self.fetch_all("SELECT id FROM borrowed_books WHERE book_id = %s AND user_id = %s", (book_id, user_id))
+        if borrowed:
+            # Set book as available
+            self.execute_query("UPDATE books SET available = 1 WHERE id = %s", (book_id,))
+            # Remove the borrow record
+            self.execute_query("DELETE FROM borrowed_books WHERE id = %s", (borrowed[0][0],))
+            print("Book returned successfully.")
+        else:
+            print("This book was not borrowed by you or does not exist.")

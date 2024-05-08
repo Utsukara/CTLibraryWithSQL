@@ -24,7 +24,7 @@ class UserInterface:
                 UserInterface.handle_new_customer_sign_up(database_manager)
             elif choice == "4":
                 print("Exiting system...")
-                quit()
+                exit()
             else:
                 print("Invalid choice. Please try again.")
 
@@ -97,7 +97,7 @@ class UserInterface:
                 database_manager.view_customer_account(customer_id)
             elif choice == "6":
                 print("Logging out...")
-                quit()
+                exit()
             else:
                 print("Invalid choice. Please try again.")
 
@@ -125,7 +125,7 @@ class UserInterface:
                 UserInterface.handle_genre_operations(database_manager)
             elif choice == "5":
                 print("Exiting system...")
-                quit()
+                exit()
             else:
                 print("Invalid choice. Please try again.")
 
