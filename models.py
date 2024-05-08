@@ -1,10 +1,9 @@
 class Book:
-    def __init__(self, book_id, title, author_id, genre_id, isbn, publication_date, available=True):
+    def __init__(self, book_id, title, author_id, genre_id, publication_date, available=True):
         self._book_id = book_id
         self.title = title
         self.author_id = author_id
         self.genre_id = genre_id
-        self.isbn = isbn
         self.publication_date = publication_date
         self.available = available
 

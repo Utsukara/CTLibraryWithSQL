@@ -55,9 +55,9 @@ class DatabaseManager:
         return results
 
     # Book operations
-    def add_new_book(self, title, author_id, genre_id, isbn, publication_date):
-        query = "INSERT INTO books (title, author_id, genre_id, isbn, publication_date) VALUES (%s, %s, %s, %s, %s)"
-        self.execute_query(query, (title, author_id, genre_id, isbn, publication_date))
+    def add_new_book(self, title, author_id, genre_id, publication_date):
+        query = "INSERT INTO books (title, author_id, genre_id, publication_date) VALUES (%s, %s, %s, %s)"
+        self.execute_query(query, (title, author_id, genre_id, publication_date))
         print("Book added successfully.")
 
     def remove_book(self, book_id):
@@ -65,7 +65,7 @@ class DatabaseManager:
         print("Book removed successfully.")
 
     def search_books(self, keyword):
-        results = self.fetch_all("SELECT * FROM books WHERE title LIKE %s OR isbn LIKE %s", ('%' + keyword + '%', '%' + keyword + '%'))
+        results = self.fetch_all("SELECT * FROM books WHERE title LIKE %s", ('%' + keyword + '%',))
         for result in results:
             print(result)
 
@@ -74,7 +74,7 @@ class DatabaseManager:
         for result in results:
             print(result)
 
-    def update_book(self, book_id, title=None, author_id=None, genre_id=None, isbn=None, publication_date=None):
+    def update_book(self, book_id, title=None, author_id=None, genre_id=None, publication_date=None):
         updates = []
         params = []
         if title:
@@ -86,9 +86,6 @@ class DatabaseManager:
         if genre_id:
             updates.append("genre_id = %s")
             params.append(genre_id)
-        if isbn:
-            updates.append("isbn = %s")
-            params.append(isbn)
         if publication_date:
             updates.append("publication_date = %s")
             params.append(publication_date)
@@ -97,10 +94,11 @@ class DatabaseManager:
         self.execute_query(query, params)
         print("Book updated successfully.")
 
+
     # Author operations
-    def add_new_author(self, name, biography):
-        query = "INSERT INTO authors (name, biography) VALUES (%s, %s)"
-        self.execute_query(query, (name, biography))
+    def add_new_author(self, name):
+        query = "INSERT INTO authors (name, biography) VALUES (%s, '')"
+        self.execute_query(query, (name,))
         print("Author added successfully.")
 
     def remove_author(self, author_id):
@@ -126,10 +124,17 @@ class DatabaseManager:
         self.execute_query(query, params)
         print("Author updated successfully.")
 
+    def find_or_add_author(self, author_name):
+        author_id = self.fetch_all("SELECT id FROM authors WHERE name = %s", (author_name,))
+        if not author_id:
+            self.execute_query("INSERT INTO authors (name, biography) VALUES (%s, '')", (author_name,))
+            author_id = self.fetch_all("SELECT id FROM authors WHERE name = %s", (author_name,))
+        return author_id[0][0]
+
     # Genre operations
-    def add_new_genre(self, name, description, category):
-        query = "INSERT INTO genres (name, description, category) VALUES (%s, %s, %s)"
-        self.execute_query(query, (name, description, category))
+    def add_new_genre(self, name, description=''):
+        query = "INSERT INTO genres (name, description) VALUES (%s, %s)"
+        self.execute_query(query, (name, description))
         print("Genre added successfully.")
 
     def remove_genre(self, genre_id):
@@ -141,7 +146,7 @@ class DatabaseManager:
         for result in results:
             print(result)
 
-    def update_genre(self, genre_id, name=None, description=None, category=None):
+    def update_genre(self, genre_id, name=None, description=None):
         updates = []
         params = []
         if name:
@@ -150,18 +155,22 @@ class DatabaseManager:
         if description:
             updates.append("description = %s")
             params.append(description)
-        if category:
-            updates.append("category = %s")
-            params.append(category)
         params.append(genre_id)
         query = f"UPDATE genres SET {', '.join(updates)} WHERE id = %s"
         self.execute_query(query, params)
         print("Genre updated successfully.")
 
+    def find_or_add_genre(self, genre_name):
+        genre_id = self.fetch_all("SELECT id FROM genres WHERE name = %s", (genre_name,))
+        if not genre_id:
+            self.execute_query("INSERT INTO genres (name, description) VALUES (%s, '')", (genre_name,))
+            genre_id = self.fetch_all("SELECT id FROM genres WHERE name = %s", (genre_name,))
+        return genre_id[0][0]
+
     # User operations
-    def add_new_user(self, name, email, phone, address, password):
-        query = "INSERT INTO users (name, email, phone, address, password) VALUES (%s, %s, %s, %s, %s)"
-        self.execute_query(query, (name, email, phone, address, password))
+    def add_new_user(self, name, email, phone, address, username, password):
+        query = "INSERT INTO users (name, email, phone, address, username, password) VALUES (%s, %s, %s, %s, %s, %s)"
+        self.execute_query(query, (name, email, phone, address, username, password))
         print("User added successfully.")
 
     def remove_user(self, user_id):
@@ -195,28 +204,3 @@ class DatabaseManager:
         query = f"UPDATE users SET {', '.join(updates)} WHERE id = %s"
         self.execute_query(query, params)
         print("User updated successfully.")
-
-    def authenticate_customer(self, username, password):
-        query = "SELECT id FROM users WHERE username = %s AND password = %s"
-        results = self.perform_database_operation(query, (username, password), fetch=True)
-        if results:
-            return results[0][0]  #return customer ID
-        return None
-    
-    def register_new_customer(self, name, email, phone, address, username, password):
-        # Check if username or email already exists to avoid duplicates
-        check_query = "SELECT EXISTS(SELECT 1 FROM users WHERE username=%s OR email=%s)"
-        exists = self.fetch_all(check_query, (username, email))
-        if exists[0][0]:
-            print("Username or email already exists. Please try a different one.")
-            return False
-
-        # Insert new user into the database
-        query = "INSERT INTO users (name, email, phone, address, username, password) VALUES (%s, %s, %s, %s, %s, %s)"
-        try:
-            self.execute_query(query, (name, email, phone, address, username, password))
-            print("New customer registered successfully.")
-            return True
-        except Error as e:
-            print(f"Error registering new customer: {e}")
-            return False

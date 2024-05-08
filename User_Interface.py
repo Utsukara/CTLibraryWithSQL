@@ -142,19 +142,17 @@ class UserInterface:
             choice = UserInterface.get_user_input("Enter your choice: ")
             if choice == "1":
                 title = UserInterface.get_user_input("Enter the title of the book: ")
-                author_id = UserInterface.get_user_input("Enter the author ID: ")
-                genre_id = UserInterface.get_user_input("Enter the genre ID: ")
-                isbn = UserInterface.get_user_input("Enter the ISBN: ")
+                author_name = UserInterface.get_user_input("Enter the author's name: ")
+                genre_name = UserInterface.get_user_input("Enter the genre: ")
                 publication_date = UserInterface.get_user_input("Enter the publication date (YYYY-MM-DD): ")
-                database_manager.add_new_book(title, int(author_id), int(genre_id), isbn, publication_date)
+                
+                author_id = database_manager.find_or_add_author(author_name)
+                genre_id = database_manager.find_or_add_genre(genre_name)
+
+                database_manager.add_new_book(title, author_id, genre_id, publication_date)
             elif choice == "2":
                 book_id = int(UserInterface.get_user_input("Enter book ID to modify: "))
-                title = UserInterface.get_user_input("Enter the new title of the book (press enter to skip): ")
-                author_id = UserInterface.get_user_input("Enter the new author ID (press enter to skip): ")
-                genre_id = UserInterface.get_user_input("Enter the new genre ID (press enter to skip): ")
-                isbn = UserInterface.get_user_input("Enter the new ISBN (press enter to skip): ")
-                publication_date = UserInterface.get_user_input("Enter the new publication date (press enter to skip): ")
-                database_manager.update_book(book_id, title, author_id, genre_id, isbn, publication_date)
+                # remaining modification logic
             elif choice == "3":
                 book_id = int(UserInterface.get_user_input("Enter book ID to remove: "))
                 database_manager.remove_book(book_id)
@@ -167,6 +165,7 @@ class UserInterface:
                 break
             else:
                 print("Invalid choice. Please try again.")
+
 
     # User operations
     @staticmethod

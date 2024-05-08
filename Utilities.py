@@ -23,9 +23,9 @@ class DatabaseManager:
         return results
 
     # Book operations
-    def add_new_book(self, title, author_id, genre_id, isbn, publication_date):
-        query = "INSERT INTO books (title, author_id, genre_id, isbn, publication_date) VALUES (%s, %s, %s, %s, %s)"
-        self.perform_database_operation(query, (title, author_id, genre_id, isbn, publication_date))
+    def add_new_book(self, title, author_id, genre_id, publication_date):
+        query = "INSERT INTO books (title, author_id, genre_id, publication_date) VALUES (%s, %s, %s, %s, %s)"
+        self.perform_database_operation(query, (title, author_id, genre_id, publication_date))
         print("Book added successfully.")
 
     def remove_book(self, book_id):
@@ -33,7 +33,7 @@ class DatabaseManager:
         self.perform_database_operation(query, (book_id,))
         print("Book removed successfully.")
 
-    def update_book(self, book_id, title=None, author_id=None, genre_id=None, isbn=None, publication_date=None):
+    def update_book(self, book_id, title=None, author_id=None, genre_id=None, publication_date=None):
         updates = []
         params = []
         if title:
@@ -45,9 +45,6 @@ class DatabaseManager:
         if genre_id:
             updates.append("genre_id = %s")
             params.append(genre_id)
-        if isbn:
-            updates.append("isbn = %s")
-            params.append(isbn)
         if publication_date:
             updates.append("publication_date = %s")
             params.append(publication_date)
@@ -57,7 +54,7 @@ class DatabaseManager:
         print("Book updated successfully.")
 
     def search_books(self, keyword):
-        query = "SELECT * FROM books WHERE title LIKE %s OR isbn LIKE %s"
+        query = "SELECT * FROM books WHERE title LIKE %s"
         results = self.perform_database_operation(query, ('%' + keyword + '%', '%' + keyword + '%'), fetch=True)
         for result in results:
             print(result)
